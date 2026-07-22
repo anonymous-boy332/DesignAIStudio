@@ -1,43 +1,26 @@
-import OpenAI from "openai";
-
 export default async function handler(req, res) {
 
   try {
 
-    const client = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    });
-
-
     const { prompt } = req.body;
 
+    if (!prompt) {
+      return res.status(400).json({
+        error: "Prompt missing"
+      });
+    }
 
-    const response = await client.images.generate({
+    const imageUrl = 
+    `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}`;
 
-      model: "gpt-image-1",
-
-      prompt: prompt,
-
-      size: "1024x1024"
-
+    return res.status(200).json({
+      image: imageUrl
     });
 
+  } catch(error) {
 
-    res.status(200).json({
-
-      image: response.data[0].url
-
-    });
-
-
-  } catch (error) {
-
-    console.log(error);
-
-    res.status(500).json({
-
-      error: error.message
-
+    return res.status(500).json({
+      error: "Image generation failed"
     });
 
   }
