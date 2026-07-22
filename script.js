@@ -1,6 +1,6 @@
 async function generateImage() {
 
-    const prompt = document.getElementById("prompt").value;
+    const prompt = document.getElementById("prompt").value.trim();
     const result = document.getElementById("result");
 
     if (!prompt) {
@@ -8,8 +8,7 @@ async function generateImage() {
         return;
     }
 
-    result.innerHTML = "Generating AI Image... Please wait 🚀";
-
+    result.innerHTML = "Generating AI Image... Please wait...";
 
     try {
 
@@ -18,34 +17,40 @@ async function generateImage() {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({
-                prompt: prompt
-            })
+            body: JSON.stringify({ prompt })
         });
-
 
         const data = await response.json();
 
+        console.log(data);
 
-        if(data.image){
+        if (response.ok && data.image) {
 
             result.innerHTML = `
-            <img src="${data.image}" 
-            style="width:100%;border-radius:15px;">
+                <img src="${data.image}"
+                     alt="AI Image"
+                     style="width:100%;max-width:700px;border-radius:15px;">
+                <br><br>
+                <a href="${data.image}" target="_blank">Open Full Image</a>
             `;
 
         } else {
 
-            result.innerHTML = "Error: Image not generated";
+            result.innerHTML = `
+                <h3>Generation Failed</h3>
+                <p>${data.error || "Unknown Error"}</p>
+            `;
 
         }
 
+    } catch (error) {
 
-    } catch(error){
+        console.error(error);
 
-        result.innerHTML = "Server Error";
-
-        console.log(error);
+        result.innerHTML = `
+            <h3>Server Error</h3>
+            <p>${error.message}</p>
+        `;
 
     }
 
